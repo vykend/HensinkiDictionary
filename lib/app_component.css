@@ -1,0 +1,30 @@
+:host {
+    /* This is equivalent of the 'body' selector of a page. */
+}
+
+
+output {
+    display: block;
+}
+
+#byte-range {
+    margin-top: 5px;
+}
+
+#drop-zone {
+    border: 2px dashed #bbb;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    color: #bbb;
+    font-size: 20pt;
+    font-weight: bold;
+    padding: 25px;
+    text-align: center;
+}
+
+#drop-zone.hover {
+    background-color: #def;
+    border-color: #777;
+    color: #777;
+}

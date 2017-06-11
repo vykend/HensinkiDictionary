@@ -1,0 +1,97 @@
+<material-tab-panel>
+    <material-tab label="New entry">
+        <div>
+            <form>
+            <material-input [(ngModel)]="english" floatingLabel label="English"></material-input>
+            <material-input [(ngModel)]="german" floatingLabel label="German"></material-input>
+            <material-input [(ngModel)]="finnish" floatingLabel label="Finnish"></material-input>
+            <material-input [(ngModel)]="romanian" floatingLabel label="Romanian"></material-input>
+                <p></p>
+            <material-button raised (trigger)="addNewEntry()">Submit</material-button>
+            </form>
+        </div>
+    </material-tab>
+    <material-tab label="Show entry">
+        <div>
+            Tab 2 contents, on the other hand, look thusly.
+        </div>
+    </material-tab>
+    <material-tab label="Delete entry">
+        <div>
+            <h3>Tab 3 is serious about its contents</h3>
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore magni
+                necessitatibus quam qui quis rerum sit, sunt voluptatum. Commodi,
+                corporis minus nemo officiis quisquam rem. Magni odit quo temporibus
+                veritatis!
+            </p>
+        </div>
+    </material-tab>
+</material-tab-panel>
+<p></p>
+<material-button raised (trigger)="download()">Download dictionary</material-button>
+<p style="padding-top: 20px"></p>
+<p>Upload dictionary...</p>
+<form id="read">
+    <input type="file" id="files_input_element" name="files[]" multiple />
+</form>
+<p>Or</p>
+<div id="drop-zone">Drop files here</div>
+<output id="list"></output>
+<modal [visible]="errorDialog">
+    <material-dialog class="basic-dialog">
+
+        <h3 header>Error</h3>
+
+        <p id="error">
+        </p>
+
+        <div footer>
+            <material-button autoFocus
+                             clear-size
+                             (trigger)="errorDialog = false"
+                             class="white">
+                Close
+            </material-button>
+        </div>
+
+    </material-dialog>
+</modal>
+<modal [visible]="successDialog">
+    <material-dialog class="basic-dialog">
+
+        <h3 header>Success</h3>
+
+        <p id="success">
+        </p>
+
+        <div footer>
+            <material-button autoFocus
+                             clear-size
+                             (trigger)="successDialog = false"
+                             class="white">
+                Close
+            </material-button>
+        </div>
+
+    </material-dialog>
+</modal>
+<modal [visible]="infoDialog">
+    <material-dialog class="basic-dialog">
+
+        <h3 header>Info</h3>
+
+        <p id="info">
+        </p>
+
+        <div footer>
+            <material-button autoFocus
+                             clear-size
+                             (trigger)="infoDialog = false"
+                             class="white">
+                Close
+            </material-button>
+        </div>
+
+    </material-dialog>
+</modal>
