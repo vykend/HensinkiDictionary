@@ -1,5 +1,5 @@
 <material-tab-panel>
-    <material-tab label="New entry">
+    <material-tab label="New">
         <div>
             <form>
             <material-input [(ngModel)]="english" floatingLabel label="English"></material-input>
@@ -11,8 +11,8 @@
             </form>
         </div>
     </material-tab>
-    <material-tab label="Show entry">
-        <div>
+    <material-tab label="Show">
+        <div style="width: 100%">
             <material-input [(ngModel)]="searchInput" floatingLabel label="Search..."></material-input>
             <p></p>
             <material-radio-group>
@@ -30,11 +30,12 @@
                 </material-radio>
             </material-radio-group>
             <p></p>
-            <material-button raised (trigger)="search()">Submit</material-button>
+            <material-button raised (trigger)="search()">Search</material-button>
+            <material-button raised (trigger)="showAll()">Show dictionary</material-button>
             <p id="showResultsOfSearch"></p>
         </div>
     </material-tab>
-    <material-tab label="Delete entry">
+    <material-tab label="Delete">
         <div>
             <h3>Tab 3 is serious about its contents</h3>
             <p>

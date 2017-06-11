@@ -28,6 +28,7 @@ import 'dart:html';
 
 class AppComponent implements OnInit {
 
+  List<String> languages = ["English", "German", "Finnish", "Romanian"];
   List<String> data = new List();
   String entry = "";
 
@@ -108,7 +109,8 @@ class AppComponent implements OnInit {
     for (var v in data) {
       var sp = v.split(";");
       if (sp[indexOfSearch] == searchInput.toString().trim())
-        results.add("English: " + sp[0] + ", German: " + sp[1] + ", Finnish: " + sp[2] + ", Romanian: " + sp[3]);
+        results.add(v);
+        //results.add("English: " + sp[0] + ", German: " + sp[1] + ", Finnish: " + sp[2] + ", Romanian: " + sp[3]);
     }
     if (results.length == 0){
       var element = querySelector('#error');
@@ -117,16 +119,58 @@ class AppComponent implements OnInit {
       return;
     }
 
-    var output = querySelector('#showResultsOfSearch');
-    output.nodes.clear();
-    for (var v in results){
-      var item = new Element.tag('p');
-      item.text = v;
-      output.nodes.add(item);
-    }
+    generateTable(results);
 
     return;
   }
+
+  showAll(){
+    generateTable(data);
+  }
+
+  void generateTable(List<String> results) {
+    var output = querySelector('#showResultsOfSearch');
+    output.nodes.clear();
+    var table = new Element.tag('table');
+    table.style.width = "100%";
+    table.style.border = "1px solid black";
+    table.style.borderCollapse = "collapse";
+    table.nodes.clear();
+    var tableWrapper = new Element.tag('tr');
+    tableWrapper.nodes.clear();
+
+
+    for(int i = 0; i < 4; i++) {
+      var tableH = new Element.th();
+      tableH.style.border = "1px solid black";
+      tableH.style.borderCollapse = "collapse";
+      tableH.style.padding = "5px";
+      tableH.style.color = "rgb(77, 144, 254)";
+      tableH.text = languages[i];
+      tableWrapper.nodes.add(tableH);
+
+    }
+    table.nodes.add(tableWrapper);
+
+    for (var v in results){
+      var tableWrapper = new Element.tag('tr');
+      var split = v.split(";");
+      split.removeLast();
+      for(var x in split){
+        var tableI = new Element.tag('td');
+        tableI.style.border = "1px solid black";
+        tableI.style.borderCollapse = "collapse";
+        tableI.style.padding = "5px";
+        tableI.text = x;
+        tableWrapper.nodes.add(tableI);
+      }
+      table.nodes.add(tableWrapper);
+
+    }
+    output.nodes.add(table);
+  }
+
+
 
 
 
