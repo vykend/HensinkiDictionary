@@ -14,7 +14,13 @@ import 'dart:html';
   selector: 'my-app',
   styleUrls: const ['app_component.css'],
   templateUrl: 'app_component.html',
-  directives: const [CORE_DIRECTIVES, materialDirectives, ModalComponent, MaterialDialogComponent],
+  directives: const [CORE_DIRECTIVES,
+                    materialDirectives,
+                    ModalComponent,
+                    MaterialDialogComponent,
+                    MaterialRadioComponent,
+                    MaterialRadioGroupComponent,
+  ],
   providers: const [materialProviders],
 )
 
@@ -34,6 +40,12 @@ class AppComponent implements OnInit {
   var successDialog;
   var infoDialog;
 
+  var searchInput;
+  var radioSearchEng;
+  var radioSearchGer;
+  var radioSearchFin;
+  var radioSearchRom;
+
   addNewEntry() {
     entry = "";
     if (english == null || german == null || finnish == null || romanian == null ||
@@ -43,10 +55,10 @@ class AppComponent implements OnInit {
       errorDialog = true;
       return;
     }
-    entry += (english.toString() + ";") ;
-    entry += (german.toString() + ";") ;
-    entry += (finnish.toString() + ";") ;
-    entry += (romanian.toString() + ";") ;
+    entry += (english.toString().trim() + ";") ;
+    entry += (german.toString().trim() + ";") ;
+    entry += (finnish.toString().trim() + ";") ;
+    entry += (romanian.toString().trim() + ";") ;
     data.add(entry);
     data = new Collection(data).distinct().toList(); //remove duplicities
     var element = querySelector('#success');
@@ -75,6 +87,48 @@ class AppComponent implements OnInit {
       ..setAttribute("download", "dictionary.csv")
       ..click();
   }
+
+  search() {
+    var indexOfSearch;
+    if (radioSearchEng)
+      indexOfSearch = 0;
+    else if (radioSearchGer)
+      indexOfSearch = 1;
+    else if (radioSearchFin)
+      indexOfSearch = 2;
+    else if (radioSearchRom)
+      indexOfSearch = 3;
+    if (searchInput == null || searchInput == "") {
+      var element = querySelector('#error');
+      element.text = 'Please fill a word you want to search!';
+      errorDialog = true;
+      return;
+    }
+    List<String> results = new List();
+    for (var v in data) {
+      var sp = v.split(";");
+      if (sp[indexOfSearch] == searchInput.toString().trim())
+        results.add("English: " + sp[0] + ", German: " + sp[1] + ", Finnish: " + sp[2] + ", Romanian: " + sp[3]);
+    }
+    if (results.length == 0){
+      var element = querySelector('#error');
+      element.text = 'Not found!';
+      errorDialog = true;
+      return;
+    }
+
+    var output = querySelector('#showResultsOfSearch');
+    output.nodes.clear();
+    for (var v in results){
+      var item = new Element.tag('p');
+      item.text = v;
+      output.nodes.add(item);
+    }
+
+    return;
+  }
+
+
 
 
 

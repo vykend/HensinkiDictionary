@@ -13,7 +13,25 @@
     </material-tab>
     <material-tab label="Show entry">
         <div>
-            Tab 2 contents, on the other hand, look thusly.
+            <material-input [(ngModel)]="searchInput" floatingLabel label="Search..."></material-input>
+            <p></p>
+            <material-radio-group>
+                <material-radio [(ngModel)]="radioSearchEng" [checked]="true">
+                    English
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioSearchGer">
+                    German
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioSearchFin">
+                    Finnish
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioSearchRom">
+                    Romanian
+                </material-radio>
+            </material-radio-group>
+            <p></p>
+            <material-button raised (trigger)="search()">Submit</material-button>
+            <p id="showResultsOfSearch"></p>
         </div>
     </material-tab>
     <material-tab label="Delete entry">
@@ -26,6 +44,8 @@
                 veritatis!
             </p>
         </div>
+    </material-tab>
+    <material-tab label="About">
     </material-tab>
 </material-tab-panel>
 <p></p>
