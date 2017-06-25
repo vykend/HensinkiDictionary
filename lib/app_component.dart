@@ -5,7 +5,6 @@ import 'package:angular2/angular2.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:queries/collections.dart';
 import 'dart:html';
-//import 'dart:io';
 
 // AngularDart info: https://webdev.dartlang.org/angular
 // Components info: https://webdev.dartlang.org/components
@@ -25,50 +24,78 @@ import 'dart:html';
 )
 
 
-
 class AppComponent implements OnInit {
 
-  List<String> languages = ["English", "German", "Finnish", "Romanian"];
-  List<String> data = new List();
+  List<String> languages = ["English", "German", "Finnish", "Romanian", "Czech"];
+  List<Lang> data = new List();
   String entry = "";
 
-
+  //languages
   var english;
   var german;
   var finnish;
   var romanian;
+  var czech;
+
+  //dialogs
   var errorDialog;
   var successDialog;
-  var infoDialog;
+  var infoDialog = true;
 
+  //search inputs
   var searchInput;
-  var radioSearchEng;
-  var radioSearchGer;
-  var radioSearchFin;
-  var radioSearchRom;
+  var radioSearchEng = false;
+  var radioSearchGer = false;
+  var radioSearchFin = false;
+  var radioSearchRom = false;
+  var radioSearchCze = false;
+  
+  //delete inputs
+  var deleteInput;
+  var radioDeleteEng = false;
+  var radioDeleteGer = false;
+  var radioDeleteFin = false;
+  var radioDeleteRom = false;
+  var radioDeleteCze = false;
+
+  nullAddForm()
+  {
+    english = null;
+    german = null;
+    finnish = null;
+    romanian = null;
+    czech = null;
+  }
+
+  dataContains(Lang x)
+  {
+	  for (var v in data)
+	  {
+		  if (v.Eng == x.Eng && v.Ger == x.Ger && v.Fin == x.Fin && v.Rom == x.Rom && v.Cze == x.Cze)
+			  return true;
+	  }
+	  return false;
+  }
 
   addNewEntry() {
     entry = "";
-    if (english == null || german == null || finnish == null || romanian == null ||
-        english == "" || german == "" || finnish == "" ||romanian == "") {
+    if (english == null || german == null || finnish == null || romanian == null || czech == null ||
+        english == "" || german == "" || finnish == "" || romanian == "" || czech == "") {
       var element = querySelector('#error');
       element.text = 'Please fill all fields!';
       errorDialog = true;
       return;
     }
-    entry += (english.toString().trim() + ";") ;
-    entry += (german.toString().trim() + ";") ;
-    entry += (finnish.toString().trim() + ";") ;
-    entry += (romanian.toString().trim() + ";") ;
-    data.add(entry);
-    data = new Collection(data).distinct().toList(); //remove duplicities
+    Lang newL = new Lang(english, german, finnish, romanian, czech);
+    if (!dataContains(newL))
+	{
+		data.add(newL);
+	}
+	
     var element = querySelector('#success');
     element.text = 'Entry succesfully added!';
     successDialog = true;
-    english = null;
-    german = null;
-    finnish = null;
-    romanian = null;
+    nullAddForm();
   }
 
   download() async {
@@ -82,7 +109,7 @@ class AppComponent implements OnInit {
     var encodedFileContents = "";
     for (var i in data)
     {
-      encodedFileContents += Uri.encodeComponent(i + "\n");
+      encodedFileContents += Uri.encodeComponent(i.Eng + ";" + i.Ger + ";" + i.Fin + ";" + i.Rom + ";" + i.Cze + "\n");
     }
     new AnchorElement(href: "data:text/plain;charset=utf-8,$encodedFileContents")
       ..setAttribute("download", "dictionary.csv")
@@ -90,33 +117,34 @@ class AppComponent implements OnInit {
   }
 
   search() {
-    var indexOfSearch;
-    if (radioSearchEng)
-      indexOfSearch = 0;
-    else if (radioSearchGer)
-      indexOfSearch = 1;
-    else if (radioSearchFin)
-      indexOfSearch = 2;
-    else if (radioSearchRom)
-      indexOfSearch = 3;
     if (searchInput == null || searchInput == "") {
       var element = querySelector('#error');
       element.text = 'Please fill a word you want to search!';
       errorDialog = true;
       return;
     }
-    List<String> results = new List();
+    List<Lang> results = new List();
     for (var v in data) {
-      var sp = v.split(";");
-      if (sp[indexOfSearch] == searchInput.toString().trim())
-        results.add(v);
-        //results.add("English: " + sp[0] + ", German: " + sp[1] + ", Finnish: " + sp[2] + ", Romanian: " + sp[3]);
+      if (radioSearchEng)
+        if(v.Eng == searchInput.toString().trim())
+          results.add(v);
+      if (radioSearchGer)
+        if(v.Ger == searchInput.toString().trim())
+          results.add(v);
+      if (radioSearchFin)
+        if(v.Fin == searchInput.toString().trim())
+          results.add(v);
+      if (radioSearchRom)
+        if(v.Rom == searchInput.toString().trim())
+          results.add(v);
+      if (radioSearchCze)
+        if(v.Cze == searchInput.toString().trim())
+          results.add(v);
     }
     if (results.length == 0){
       var element = querySelector('#error');
       element.text = 'Not found!';
       errorDialog = true;
-      return;
     }
 
     generateTable(results);
@@ -128,7 +156,7 @@ class AppComponent implements OnInit {
     generateTable(data);
   }
 
-  void generateTable(List<String> results) {
+  void generateTable(List<Lang> results) {
     var output = querySelector('#showResultsOfSearch');
     output.nodes.clear();
     var table = new Element.tag('table');
@@ -139,8 +167,8 @@ class AppComponent implements OnInit {
     var tableWrapper = new Element.tag('tr');
     tableWrapper.nodes.clear();
 
-
-    for(int i = 0; i < 4; i++) {
+    //header
+    for(int i = 0; i < 5; i++) {
       var tableH = new Element.th();
       tableH.style.border = "1px solid black";
       tableH.style.borderCollapse = "collapse";
@@ -152,16 +180,25 @@ class AppComponent implements OnInit {
     }
     table.nodes.add(tableWrapper);
 
+    //rows
     for (var v in results){
       var tableWrapper = new Element.tag('tr');
-      var split = v.split(";");
-      split.removeLast();
-      for(var x in split){
+
+      for (var i = 0; i < 5; i++) {
         var tableI = new Element.tag('td');
         tableI.style.border = "1px solid black";
         tableI.style.borderCollapse = "collapse";
         tableI.style.padding = "5px";
-        tableI.text = x;
+        if (i == 0)
+          tableI.text = v.Eng;
+        else if (i == 1)
+          tableI.text = v.Ger;
+        else if (i == 2)
+          tableI.text = v.Fin;
+        else if (i == 3)
+          tableI.text = v.Rom;
+        else if (i == 4)
+          tableI.text = v.Cze;
         tableWrapper.nodes.add(tableI);
       }
       table.nodes.add(tableWrapper);
@@ -170,7 +207,78 @@ class AppComponent implements OnInit {
     output.nodes.add(table);
   }
 
-
+  
+  deleteEntry()
+  {
+	 if (deleteInput == null || deleteInput == "") {
+      var element = querySelector('#error');
+      element.text = 'Please fill a word you want to delete!';
+      errorDialog = true;
+      return;
+    }
+	var found = false;
+	for (var v in data) {
+      if (radioDeleteEng)
+	  {
+        if(v.Eng == deleteInput.toString().trim())
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}		  
+	  }
+      if (radioDeleteGer)
+	  {
+        if(v.Ger == deleteInput.toString().trim())
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}		  
+	  }
+      if (radioDeleteFin)
+	  {
+        if(v.Fin == deleteInput.toString().trim())
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}		  
+	  }
+      if (radioDeleteRom)
+	  {
+        if(v.Rom == deleteInput.toString().trim())
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}		  
+	  }
+      if (radioDeleteCze)
+	  {
+        if(v.Cze == deleteInput.toString().trim())
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}		  
+	  }
+    }
+	
+    if(!found) {
+	  var element = querySelector('#error');
+	  element.text = 'Not found!';
+	  errorDialog = true;
+	  return;
+	}
+	else
+	{
+	  var element = querySelector('#success');
+      element.text = deleteInput.toString().trim() + ' succesfully removed!';
+      successDialog = true;
+	}
+	
+  }
 
 
 
@@ -237,6 +345,7 @@ class AppComponent implements OnInit {
           var element = querySelector('#error');
           element.text = 'File ' + file.name.toString() + " has a wrong format!";
           errorDialog = true;
+		  return;
         }
 
       }
@@ -245,7 +354,6 @@ class AppComponent implements OnInit {
       infoDialog = true;
 
   }
-
 
   fillDataFromFile(String x) {
     var splitted = x.split("\n");
@@ -256,17 +364,29 @@ class AppComponent implements OnInit {
       if (splitted2nd.length != 5){
         throw new Exception("Wrong data");
       }
-      if (splitted != null && !data.contains(v)) {
-        data.add(v);
+      Lang newEntry = new Lang(splitted2nd[0], splitted2nd[1], splitted2nd[2], splitted2nd[3], splitted2nd[4]);
+      if (splitted != null && !dataContains(newEntry)) {
+        data.add(newEntry);
       }
     }
-    data = new Collection(data).distinct().toList(); //remove duplicities
   }
 
     @override
     ngOnInit() {
       DndFiles();
     }
+}
+
+
+
+class Lang {
+  String Eng;
+  String Ger;
+  String Fin;
+  String Rom;
+  String Cze;
+
+  Lang(this.Eng, this.Ger, this.Fin, this.Rom, this.Cze);
 }
 
 

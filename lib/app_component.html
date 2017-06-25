@@ -6,13 +6,15 @@
             <material-input [(ngModel)]="german" floatingLabel label="German"></material-input>
             <material-input [(ngModel)]="finnish" floatingLabel label="Finnish"></material-input>
             <material-input [(ngModel)]="romanian" floatingLabel label="Romanian"></material-input>
-                <p></p>
+            <material-input [(ngModel)]="czech" floatingLabel label="Czech"></material-input>
+            <p></p>
             <material-button raised (trigger)="addNewEntry()">Submit</material-button>
             </form>
         </div>
     </material-tab>
     <material-tab label="Show">
         <div style="width: 100%">
+			<p>Enter a word in selected language:</p>
             <material-input [(ngModel)]="searchInput" floatingLabel label="Search..."></material-input>
             <p></p>
             <material-radio-group>
@@ -27,6 +29,9 @@
                 </material-radio><p></p>
                 <material-radio [(ngModel)]="radioSearchRom">
                     Romanian
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioSearchCze">
+                    Czech
                 </material-radio>
             </material-radio-group>
             <p></p>
@@ -36,17 +41,47 @@
         </div>
     </material-tab>
     <material-tab label="Delete">
-        <div>
-            <h3>Tab 3 is serious about its contents</h3>
-            <p>
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore magni
-                necessitatibus quam qui quis rerum sit, sunt voluptatum. Commodi,
-                corporis minus nemo officiis quisquam rem. Magni odit quo temporibus
-                veritatis!
-            </p>
+        <div style="width: 100%">
+			<p>Enter a word in selected language you wish to remove from the database:</p>
+            <material-input [(ngModel)]="deleteInput" floatingLabel label="Delete..."></material-input>
+            <p></p>
+            <material-radio-group>
+                <material-radio [(ngModel)]="radioDeleteEng" [checked]="true">
+                    English
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioDeleteGer">
+                    German
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioDeleteFin">
+                    Finnish
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioDeleteRom">
+                    Romanian
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioDeleteCze">
+                    Czech
+                </material-radio>
+            </material-radio-group>
+            <p></p>
+            <material-button raised (trigger)="deleteEntry()">Delete</material-button>
+
         </div>
     </material-tab>
     <material-tab label="About">
+    <div style="width: 100%">
+		<h3>WARNING: Closing the app will reset current dictionary!</h3>
+		<p>Download your dictionary before leaving the app!</p>
+		<p>Everyone has his own copy of the dictionary, this app works on that local copy, nothing is synced to server."</p>		
+		<p style="height: 1em"></p>
+		<h3>Instructions</h3>
+		<p>On tab "New" you can add new entry to the current dictionary. You have to fill all languages for entry to be accepted.</p>
+		<p>On tab "Show" you can search a word in selected language in current dictionary.</p>
+		<p>On tab "Delete" you can remove a word in selected language from current dictionary.</p>
+		<p style="height: 1em"></p>
+		<p>You can start using this app with empty dictionary or upload dictionary/dictionaries created with this app before.</p>
+		<p style="height: 1em"></p>
+		<p>Developed by <a href="https://twitter.com/vykend" target="_blank">Martin Výlet</a></p>
+	</div>
     </material-tab>
 </material-tab-panel>
 <p></p>
@@ -103,6 +138,7 @@
         <h3 header>Info</h3>
 
         <p id="info">
+		Read "About" before using this app!
         </p>
 
         <div footer>
