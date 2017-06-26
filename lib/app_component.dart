@@ -1,4 +1,4 @@
-// Copyright (c) 2017, Martin. All rights reserved. Use of this source code
+// Copyright (c) 2017, Martin Vylet. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'package:angular2/angular2.dart';
@@ -31,11 +31,11 @@ class AppComponent implements OnInit {
   String entry = "";
 
   //languages
-  var english;
-  var german;
-  var finnish;
-  var romanian;
-  var czech;
+  var english = "";
+  var german = "";
+  var finnish = "";
+  var romanian = "";
+  var czech = "";
 
   //dialogs
   var errorDialog;
@@ -60,11 +60,11 @@ class AppComponent implements OnInit {
 
   nullAddForm()
   {
-    english = null;
-    german = null;
-    finnish = null;
-    romanian = null;
-    czech = null;
+    english = "";
+    german = "";
+    finnish = "";
+    romanian = "";
+    czech = "";
   }
 
   dataContains(Lang x)
@@ -79,10 +79,21 @@ class AppComponent implements OnInit {
 
   addNewEntry() {
     entry = "";
-    if (english == null || german == null || finnish == null || romanian == null || czech == null ||
-        english == "" || german == "" || finnish == "" || romanian == "" || czech == "") {
+	var inputCount = 0;
+	if(english != "")
+		inputCount++;
+	if(german != "")
+		inputCount++;
+	if(finnish != "")
+		inputCount++;
+	if(romanian != "")
+		inputCount++;
+	if(czech != "")
+		inputCount++;
+	
+    if (inputCount < 2) {
       var element = querySelector('#error');
-      element.text = 'Please fill all fields!';
+      element.text = 'Please fill atleast 2 languages!';
       errorDialog = true;
       return;
     }
