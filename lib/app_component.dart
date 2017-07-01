@@ -93,7 +93,7 @@ class AppComponent implements OnInit {
 	
     if (inputCount < 2) {
       var element = querySelector('#error');
-      element.text = 'Please fill atleast 2 languages!';
+      element.text = 'Please fill at least 2 languages!';
       errorDialog = true;
       return;
     }
