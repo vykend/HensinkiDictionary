@@ -26,6 +26,7 @@ import 'dart:html';
 
 class AppComponent implements OnInit {
 
+  
   List<String> languages = ["English", "German", "Finnish", "Romanian", "Czech"];
   List<Lang> data = new List();
   String entry = "";
@@ -57,6 +58,9 @@ class AppComponent implements OnInit {
   var radioDeleteFin = false;
   var radioDeleteRom = false;
   var radioDeleteCze = false;
+
+  
+   
 
   nullAddForm()
   {

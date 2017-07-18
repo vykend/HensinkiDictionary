@@ -7,4 +7,6 @@ import 'package:ProjectEU_Dart/app_component.dart';
 
 void main() {
   bootstrap(AppComponent);
+
 }
+
