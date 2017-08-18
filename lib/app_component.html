@@ -18,26 +18,70 @@
             <material-input [(ngModel)]="searchInput" floatingLabel label="Search..."></material-input>
             <p></p>
             <material-radio-group>
-                <material-radio [(ngModel)]="radioSearchEng" [checked]="true">
+                <material-radio [(ngModel)]="radioEng" [checked]="true">
                     English
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioSearchGer">
+                <material-radio [(ngModel)]="radioGer">
                     German
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioSearchFin">
+                <material-radio [(ngModel)]="radioFin">
                     Finnish
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioSearchRom">
+                <material-radio [(ngModel)]="radioRom">
                     Romanian
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioSearchCze">
+                <material-radio [(ngModel)]="radioCze">
                     Czech
                 </material-radio>
             </material-radio-group>
             <p></p>
-            <material-button raised (trigger)="search()">Search</material-button>
+            <material-button raised (trigger)="searchEntries()">Search</material-button>
             <material-button raised (trigger)="showAll()">Show dictionary</material-button>
             <p id="showResultsOfSearch"></p>
+        </div>
+    </material-tab>
+	<material-tab label="Edit">
+        <div style="width: 100%">
+			<p>Enter a word in selected language you wish to edit:</p>
+            <material-input [(ngModel)]="editInput" floatingLabel label="Edit..."></material-input>
+            <p></p>
+            <material-radio-group>
+                <material-radio [(ngModel)]="radioEng" [checked]="true">
+                    English
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioGer">
+                    German
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioFin">
+                    Finnish
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioRom">
+                    Romanian
+                </material-radio><p></p>
+                <material-radio [(ngModel)]="radioCze">
+                    Czech
+                </material-radio>
+            </material-radio-group>
+            <p></p>
+            <material-button raised (click)="submitted=true" (trigger)="editEntry()">Edit</material-button>
+			<div [hidden]="!submitted">
+				<p>Please specify a word you want to edit:</p>
+				<p><material-select>
+					<material-select-item *ngFor="let p of editSelect" [value]="p" (trigger)="editSelected = p" [selected]="editSelected == p">{{p}}</material-select-item>
+				</material-select></p>
+				<p><material-button raised (click)="submitted=false" (click)="editConfirmed=true" (trigger)="onEditConfirm()">Confirm</material-button></p>
+			</div>
+			<p></p>
+			<div [hidden]="!editConfirmed">
+				<material-input [(ngModel)]="editEnglish" floatingLabel label="English"></material-input>
+				<material-input [(ngModel)]="editGerman" floatingLabel label="German"></material-input>
+				<material-input [(ngModel)]="editFinnish" floatingLabel label="Finnish"></material-input>
+				<material-input [(ngModel)]="editRomanian" floatingLabel label="Romanian"></material-input>
+				<material-input [(ngModel)]="editCzech" floatingLabel label="Czech"></material-input>
+				<p><material-button  raised (click)="editConfirmed=false" (trigger)="editSave()">Save</material-button></p>
+			</div>
+			
+			
         </div>
     </material-tab>
     <material-tab label="Delete">
@@ -46,35 +90,44 @@
             <material-input [(ngModel)]="deleteInput" floatingLabel label="Delete..."></material-input>
             <p></p>
             <material-radio-group>
-                <material-radio [(ngModel)]="radioDeleteEng" [checked]="true">
+                <material-radio [(ngModel)]="radioEng" [checked]="true">
                     English
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioDeleteGer">
+                <material-radio [(ngModel)]="radioGer">
                     German
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioDeleteFin">
+                <material-radio [(ngModel)]="radioFin">
                     Finnish
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioDeleteRom">
+                <material-radio [(ngModel)]="radioRom">
                     Romanian
                 </material-radio><p></p>
-                <material-radio [(ngModel)]="radioDeleteCze">
+                <material-radio [(ngModel)]="radioCze">
                     Czech
                 </material-radio>
             </material-radio-group>
             <p></p>
-            <material-button raised (trigger)="deleteEntry()">Delete</material-button>
+            <material-button raised (click)="submittedDelete=true" (trigger)="deleteEntry()">Delete</material-button>
+			<div [hidden]="!submittedDelete">
+				<p>Please specify a word you want to delete:</p>
+				<p><material-select>
+					<material-select-item *ngFor="let p of deleteSelect" [value]="p" (trigger)="deleteSelected = p" [selected]="deleteSelected == p">{{p}}</material-select-item>
+				</material-select></p>
+				<p><material-button raised (click)="submittedDelete=false" (trigger)="onDeleteConfirm()">Confirm</material-button></p>
+			</div>
+			<p></p>
         </div>
     </material-tab>
     <material-tab label="About">
     <div style="width: 100%">
 		<h3>WARNING: Closing the app will reset current dictionary!</h3>
 		<p>Download your dictionary before leaving the app!</p>
-		<p>Everyone has his own copy of the dictionary, this app works on that local copy, nothing is synced to server."</p>		
+		<p>Everyone has his own copy of the dictionary, this app works on that local copy, nothing is synced to server.</p>		
 		<p style="height: 1em"></p>
 		<h3>Instructions</h3>
 		<p>On tab "New" you can add new entry to the current dictionary. You have to at least 2 languages for entry to be accepted.</p>
 		<p>On tab "Show" you can search a word in selected language in current dictionary.</p>
+		<p>On tab "Edit" you can edit existing entry.
 		<p>On tab "Delete" you can remove a word in selected language from current dictionary.</p>
 		<p style="height: 1em"></p>
 		<p>You can start using this app with empty dictionary or upload dictionary/dictionaries created with this app before.</p>

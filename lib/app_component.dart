@@ -1,10 +1,14 @@
 // Copyright (c) 2017, Martin Vylet. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
+//KNOWN ISSUE: when editting, if entered < 2 words, form will hide and cannot be repaired, original entry is not edited
+
 import 'package:angular2/angular2.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:queries/collections.dart';
 import 'dart:html';
+import 'dart:convert';
+
 
 // AngularDart info: https://webdev.dartlang.org/angular
 // Components info: https://webdev.dartlang.org/components
@@ -25,11 +29,9 @@ import 'dart:html';
 
 
 class AppComponent implements OnInit {
-
   
   List<String> languages = ["English", "German", "Finnish", "Romanian", "Czech"];
   List<Lang> data = new List();
-  String entry = "";
 
   //languages
   var english = "";
@@ -45,31 +47,117 @@ class AppComponent implements OnInit {
 
   //search inputs
   var searchInput;
-  var radioSearchEng = false;
-  var radioSearchGer = false;
-  var radioSearchFin = false;
-  var radioSearchRom = false;
-  var radioSearchCze = false;
+  var radioEng = false;
+  var radioGer = false;
+  var radioFin = false;
+  var radioRom = false;
+  var radioCze = false;
   
   //delete inputs
   var deleteInput;
-  var radioDeleteEng = false;
-  var radioDeleteGer = false;
-  var radioDeleteFin = false;
-  var radioDeleteRom = false;
-  var radioDeleteCze = false;
-
   
-   
+  List<String> deleteSelect = new List();  
+  var deleteSelected;
+  
+  var submittedDelete = false;
 
-  nullAddForm()
-  {
+  //edit stuff
+  var editInput;
+  
+  List<String> editSelect = new List();
+  var editSelected;
+  
+  var editEnglish;
+  var editGerman;
+  var editFinnish;
+  var editRomanian;
+  var editCzech;
+  
+  bool submitted = false;
+  bool editConfirmed = false;
+   
+   editEntry()
+   {
+		if (editInput == null || editInput == "") {
+			var element = querySelector('#error');
+			element.text = 'Please fill a word you want to edit!';
+			errorDialog = true;
+			return;
+		}
+		List<Lang> results = search(editInput.toString().trim());
+		if (results.length == 0){
+			editConfirmed = false;
+			submitted = false;
+			var element = querySelector('#error');
+			element.text = 'Not found!';
+			errorDialog = true;
+			return;
+		}
+		editSelect.clear();
+		for (var v in results)
+		{
+			var line = v.Eng + "; " + v.Ger + "; " + v.Fin + "; " + v.Rom + "; " + v.Cze;
+			editSelect.add(line);
+			if( editSelect.length >=0);
+				editSelected = editSelect[0];
+		}
+	   
+   
+   }
+   
+   onEditConfirm()
+   {
+	   if (editSelected == null || editSelected == "")
+	   {
+		   return;
+	   }
+	   var splitted = editSelected.split(";");
+	   for (var v in splitted)
+		   v = v.trim();
+		
+		if (splitted.length < 4)
+			return;
+		editEnglish = splitted[0];
+		editGerman = splitted[1];
+		editFinnish = splitted[2];
+		editRomanian = splitted[3];
+		if(splitted.length == 5)
+			editCzech = splitted[4];
+		else
+			editCzech = "";
+   }
+   
+   editSave()
+   {
+		if(add(editEnglish,editGerman,editFinnish,editRomanian,editCzech))
+		{
+			
+			if(!delete1(editSelected))
+				print("nodopice");
+			var element = querySelector('#success');
+			element.text = 'Entry succesfully edited!';
+			successDialog = true;
+			nullEditForm();
+		}
+		
+  }
+
+   nullAddForm()
+   {
     english = "";
     german = "";
     finnish = "";
     romanian = "";
     czech = "";
-  }
+   }
+    nullEditForm()
+	{
+		editEnglish = "";
+		editGerman = "";
+		editFinnish = "";
+		editRomanian = "";
+		editCzech = "";
+	}
 
   dataContains(Lang x)
   {
@@ -81,36 +169,44 @@ class AppComponent implements OnInit {
 	  return false;
   }
 
-  addNewEntry() {
-    entry = "";
+  add(var e, var g, var f, var r, var c)
+  {
 	var inputCount = 0;
-	if(english != "")
+	if(e != "")
 		inputCount++;
-	if(german != "")
+	if(g != "")
 		inputCount++;
-	if(finnish != "")
+	if(f != "")
 		inputCount++;
-	if(romanian != "")
+	if(r != "")
 		inputCount++;
-	if(czech != "")
+	if(c != "")
 		inputCount++;
 	
     if (inputCount < 2) {
       var element = querySelector('#error');
       element.text = 'Please fill at least 2 languages!';
       errorDialog = true;
-      return;
+      return false;
     }
-    Lang newL = new Lang(english, german, finnish, romanian, czech);
+    Lang newL = new Lang(e, g, f, r, c,(e + " - " + g + " - " + f + " - " + r + " - " + c));
     if (!dataContains(newL))
 	{
 		data.add(newL);
 	}
+	return true;
+  }
+  
+  addNewEntry() {
 	
-    var element = querySelector('#success');
-    element.text = 'Entry succesfully added!';
-    successDialog = true;
-    nullAddForm();
+	if(add(english,german,finnish,romanian,czech))
+	{
+		
+		var element = querySelector('#success');
+		element.text = 'Entry succesfully added!';
+		successDialog = true;
+		nullAddForm();
+	}
   }
 
   download() async {
@@ -131,46 +227,53 @@ class AppComponent implements OnInit {
       ..click();
   }
 
-  search() {
+  searchEntries() {
     if (searchInput == null || searchInput == "") {
       var element = querySelector('#error');
       element.text = 'Please fill a word you want to search!';
       errorDialog = true;
       return;
     }
-    List<Lang> results = new List();
-    for (var v in data) {
-      if (radioSearchEng)
-        if(v.Eng == searchInput.toString().trim())
-          results.add(v);
-      if (radioSearchGer)
-        if(v.Ger == searchInput.toString().trim())
-          results.add(v);
-      if (radioSearchFin)
-        if(v.Fin == searchInput.toString().trim())
-          results.add(v);
-      if (radioSearchRom)
-        if(v.Rom == searchInput.toString().trim())
-          results.add(v);
-      if (radioSearchCze)
-        if(v.Cze == searchInput.toString().trim())
-          results.add(v);
-    }
+	List<Lang> results = search(searchInput.toString().trim());
     if (results.length == 0){
       var element = querySelector('#error');
       element.text = 'Not found!';
       errorDialog = true;
+	  return;
     }
-
     generateTable(results);
+  }
 
-    return;
+  search(String x) //returns List<Lang> od results found in database
+  {
+	
+    List<Lang> results = new List();
+    for (var v in data) {
+      if (radioEng)
+        if(v.Eng == x)
+          results.add(v);
+      if (radioGer)
+        if(v.Ger == x)
+          results.add(v);
+      if (radioFin)
+        if(v.Fin == x)
+          results.add(v);
+      if (radioRom)
+        if(v.Rom == x)
+          results.add(v);
+      if (radioCze)
+        if(v.Cze == x)
+          results.add(v);
+    }
+	
+	return results;
   }
 
   showAll(){
     generateTable(data);
   }
-
+  
+  
   void generateTable(List<Lang> results) {
     var output = querySelector('#showResultsOfSearch');
     output.nodes.clear();
@@ -231,72 +334,55 @@ class AppComponent implements OnInit {
       errorDialog = true;
       return;
     }
-	var found = false;
-	for (var v in data) {
-      if (radioDeleteEng)
-	  {
-        if(v.Eng == deleteInput.toString().trim())
-		{
-			found = true;
-			data.remove(v);
-			break;
-		}		  
-	  }
-      if (radioDeleteGer)
-	  {
-        if(v.Ger == deleteInput.toString().trim())
-		{
-			found = true;
-			data.remove(v);
-			break;
-		}		  
-	  }
-      if (radioDeleteFin)
-	  {
-        if(v.Fin == deleteInput.toString().trim())
-		{
-			found = true;
-			data.remove(v);
-			break;
-		}		  
-	  }
-      if (radioDeleteRom)
-	  {
-        if(v.Rom == deleteInput.toString().trim())
-		{
-			found = true;
-			data.remove(v);
-			break;
-		}		  
-	  }
-      if (radioDeleteCze)
-	  {
-        if(v.Cze == deleteInput.toString().trim())
-		{
-			found = true;
-			data.remove(v);
-			break;
-		}		  
-	  }
-    }
-	
-    if(!found) {
-	  var element = querySelector('#error');
-	  element.text = 'Not found!';
-	  errorDialog = true;
-	  return;
+	List<Lang> results = search(deleteInput.toString().trim());
+	if (results.length == 0){
+		var element = querySelector('#error');
+		element.text = 'Not found!';
+		errorDialog = true;
+		return;
 	}
-	else
+	deleteSelect.clear();
+	for (var v in results)
 	{
-	  var element = querySelector('#success');
-      element.text = deleteInput.toString().trim() + ' succesfully removed!';
-      successDialog = true;
+		var line = v.Eng + "; " + v.Ger + "; " + v.Fin + "; " + v.Rom + "; " + v.Cze;
+		deleteSelect.add(line);
+		if( deleteSelect.length >=0);
+			deleteSelected = deleteSelect[0];
 	}
-	
+	   
+   
   }
-
-
-
+  
+  onDeleteConfirm()
+  {
+	 if (deleteSelected == null || deleteSelected == "")
+	 {
+		return;
+	 }
+	 if(delete1(deleteSelected))
+	 {
+		var element = querySelector('#success');
+		element.text = 'Entry succesfully deleted!';
+		successDialog = true;
+	 }
+  }
+  
+  delete1(String x)
+  {
+	
+	var found = false;
+	for (var v in data) 
+	{
+		var toDelete = v.Eng + "; " + v.Ger + "; " + v.Fin + "; " + v.Rom + "; " + v.Cze;
+        if(toDelete == x)
+		{
+			found = true;
+			data.remove(v);
+			break;
+		}	
+    }
+	return found;
+  }
 
 
 
@@ -379,7 +465,7 @@ class AppComponent implements OnInit {
       if (splitted2nd.length != 5){
         throw new Exception("Wrong data");
       }
-      Lang newEntry = new Lang(splitted2nd[0], splitted2nd[1], splitted2nd[2], splitted2nd[3], splitted2nd[4]);
+      Lang newEntry = new Lang(splitted2nd[0], splitted2nd[1], splitted2nd[2], splitted2nd[3], splitted2nd[4], (splitted2nd[0]+" - "+ splitted2nd[1]+ " - " +splitted2nd[2]+" - "+splitted2nd[3]+" - " +splitted2nd[4]));
       if (splitted != null && !dataContains(newEntry)) {
         data.add(newEntry);
       }
@@ -394,14 +480,21 @@ class AppComponent implements OnInit {
 
 
 
-class Lang {
+class Lang implements HasUIDisplayName  {
   String Eng;
   String Ger;
   String Fin;
   String Rom;
   String Cze;
+  String label;
+  
+  Lang(this.Eng, this.Ger, this.Fin, this.Rom, this.Cze, this.label);
+  
+    @override
+  String get uiDisplayName => label;
 
-  Lang(this.Eng, this.Ger, this.Fin, this.Rom, this.Cze);
+  @override
+  String toString() => uiDisplayName;
 }
 
 
